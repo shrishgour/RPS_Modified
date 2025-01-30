@@ -1,0 +1,10 @@
+using Sequencer.Commands;
+
+namespace #NAMESPACE#
+{
+	[System.Serializable]
+	public class #CLASSNAME# : BaseSingleDirectionalCommandNode<#BODY#>
+	{
+
+	}
+}
