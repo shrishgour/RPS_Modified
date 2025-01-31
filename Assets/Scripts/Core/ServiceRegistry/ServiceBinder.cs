@@ -1,6 +1,4 @@
-﻿using Core.Sequencer;
-using Game.Requirements;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Core.Services
 {
@@ -11,9 +9,6 @@ namespace Core.Services
         private void Awake()
         {
             ServiceRegistry.Bind<UserState>(new UserState());
-            ServiceRegistry.Bind<SequenceService>(new SequenceService());
-            ServiceRegistry.Bind<ProgressionService>(new ProgressionService());
-            ServiceRegistry.Bind<RequirementService>(new RequirementService());
 
             IsInitialized = true;
         }

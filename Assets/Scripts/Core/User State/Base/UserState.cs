@@ -8,12 +8,18 @@ namespace Core.Services
     {
         public const string ExampleInteger = "example_int";
         public const string CustomState = "custom_State";
-        public const string ProgressionStateKey = "Progression_Key";
+        public const string HighScore = "high_score";
 
         public int ExampleInt
         {
-            get { return GetValue(ExampleInteger, 0); }
-            set { SetValue<int>(ExampleInteger, value); }
+            get => GetValue(ExampleInteger, 0);
+            set => SetValue<int>(ExampleInteger, value);
+        }
+
+        public int HighScoreValue
+        {
+            get => GetValue<int>(HighScore, 0);
+            set => SetValue<int>(HighScore, value);
         }
 
         //public ExampleCustomState ExampleCustomState
@@ -22,12 +28,6 @@ namespace Core.Services
         //    set { SetValue<int>(CustomState, value); }
         //}
 
-        public ProgressionUserState ProgressionState
-        {
-            get { return GetValue(ProgressionStateKey, new ProgressionUserState()); }
-            set { SetValue<int>(ProgressionStateKey, value); }
-        }
-
         private T GetValue<T>(string key, T defaultValue)
         {
             return PlayerPrefs.HasKey(key) ? JsonConvert.DeserializeObject<T>(PlayerPrefs.GetString(key)) : defaultValue;
@@ -35,13 +35,11 @@ namespace Core.Services
 
         private void SetValue<T>(string key, object value)
         {
-            string data = JsonConvert.SerializeObject(value, Formatting.None, new JsonSerializerSettings()
+            var data = JsonConvert.SerializeObject(value, Formatting.None, new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
             PlayerPrefs.SetString(key, data);
-
-            //Update Server Database here
         }
 
         public void ClearUserState()

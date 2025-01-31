@@ -1,8 +1,8 @@
-﻿using Core.Config;
-using Core.Singleton;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Config;
+using Core.Singleton;
 using UnityEngine;
 
 namespace Core.UI
@@ -13,11 +13,11 @@ namespace Core.UI
         public Transform dilogRoot;
 
         public bool IsAnyDialogOpen => visibleDialogs.Count > 0 || dialogStack.Count > 0;
-        private List<Tuple<string, IDialog>> dialogStack = new List<Tuple<string, IDialog>>();
-        private Dictionary<string, GameObject> dialogPrefabMap = new Dictionary<string, GameObject>();
-        private List<IDialog> visibleDialogs = new List<IDialog>();
+        private List<Tuple<string, IDialog>> dialogStack = new();
+        private Dictionary<string, GameObject> dialogPrefabMap = new();
+        private List<IDialog> visibleDialogs = new();
         private IDialog TopOfDialogStack => dialogStack.Count > 0 ? dialogStack[dialogStack.Count - 1].Item2 : null;
-        private List<IQueuedDialog> queuedDialogs = new List<IQueuedDialog>();
+        private List<IQueuedDialog> queuedDialogs = new();
 
         public Action AllDialogsClosed;
         public Action<string> DialogOpened;
@@ -57,12 +57,12 @@ namespace Core.UI
             CreateOrLoadDialogs();
         }
 
-        void CreateOrLoadDialogs()
+        private void CreateOrLoadDialogs()
         {
             var dialogs = ConfigRegistry.GetConfig<UIDialogConfig>().data;
             foreach (var item in dialogs)
             {
-                GameObject go = Instantiate(item.prefab, dilogRoot);
+                var go = Instantiate(item.prefab, dilogRoot);
                 go.SetActive(false);
                 dialogPrefabMap.Add(item.dialogID, go);
             }
@@ -74,10 +74,11 @@ namespace Core.UI
             if (dialogPrefabMap.ContainsKey(uiDialogId))
             {
                 TDialog newDialog = null;
-                if (dialogPrefabMap.TryGetValue(uiDialogId, out GameObject dialog))
+                if (dialogPrefabMap.TryGetValue(uiDialogId, out var dialog))
                 {
                     newDialog = InstantiateDialog<TDialog>(dialog);
                 }
+
                 dialogInitializer?.Invoke(newDialog);
                 StartOpenDialog(uiDialogId, newDialog, overlayOnPrevious);
                 DialogOpened?.Invoke(uiDialogId);
@@ -92,7 +93,7 @@ namespace Core.UI
                 int queueIndex;
                 for (queueIndex = 0; queueIndex < queuedDialogs.Count; queueIndex++)
                 {
-                    if (dialogPrefabMap.TryGetValue(uiDialogId, out GameObject gameObject))
+                    if (dialogPrefabMap.TryGetValue(uiDialogId, out var gameObject))
                     {
                         if (gameObject.GetComponent<BaseDialog>().DialogQueuePriority() < queuedDialogs[queueIndex].Priority)
                         {
@@ -125,19 +126,19 @@ namespace Core.UI
 
         public TDialog GetDialog<TDialog>(string uiDialogId) where TDialog : class, IDialog
         {
-            int positionInStack = dialogStack.FindLastIndex(tuple => tuple.Item1 == uiDialogId);
+            var positionInStack = dialogStack.FindLastIndex(tuple => tuple.Item1 == uiDialogId);
             return positionInStack > -1 ? dialogStack[positionInStack].Item2 as TDialog : null;
         }
 
         private TDialog InstantiateDialog<TDialog>(GameObject dialogPrefab) where TDialog : class, IDialog
         {
-            TDialog dialogComponent = dialogPrefab.GetComponent<TDialog>();
+            var dialogComponent = dialogPrefab.GetComponent<TDialog>();
             return dialogComponent;
         }
 
         private void StartOpenDialog(string uiDialogId, IDialog dialog, bool overlayOnPrevious)
         {
-            IDialog previousDialog = TopOfDialogStack;
+            var previousDialog = TopOfDialogStack;
             if (previousDialog != null)
             {
                 previousDialog.OnHide();
@@ -145,6 +146,7 @@ namespace Core.UI
                 if (!overlayOnPrevious)
                 {
                     previousDialog.SetVisible(false);
+                    CloseDialog(previousDialog);
 
                     if (visibleDialogs.Contains(previousDialog))
                     {
@@ -153,7 +155,7 @@ namespace Core.UI
                 }
             }
 
-            int stackIndex = dialogStack.FindLastIndex(tuple => tuple.Item2 == dialog);
+            var stackIndex = dialogStack.FindLastIndex(tuple => tuple.Item2 == dialog);
 
             if (stackIndex < 0)
             {
@@ -170,7 +172,7 @@ namespace Core.UI
 
         public void CloseDialog(string uiDialogId)
         {
-            IDialog dialogInStack = GetDialog<IDialog>(uiDialogId);
+            var dialogInStack = GetDialog<IDialog>(uiDialogId);
             if (dialogInStack != null)
             {
                 CloseDialog(dialogInStack);
@@ -187,8 +189,9 @@ namespace Core.UI
             {
                 AllDialogsClosed?.Invoke();
             }
-            IDialog preTopOfStack = TopOfDialogStack;
-            int positionInStack = dialogStack.FindIndex(tuple => tuple.Item2 == dialog);
+
+            var preTopOfStack = TopOfDialogStack;
+            var positionInStack = dialogStack.FindIndex(tuple => tuple.Item2 == dialog);
             string dialogId = null;
 
             if (positionInStack > -1)
@@ -208,7 +211,7 @@ namespace Core.UI
             {
                 dialog.OnHide();
 
-                IDialog nextTopOfStack = TopOfDialogStack;
+                var nextTopOfStack = TopOfDialogStack;
 
                 void DialogClosed()
                 {
@@ -218,6 +221,7 @@ namespace Core.UI
                         ShowDialog(nextTopOfStack);
                     }
                 }
+
                 DialogClosed();
             }
             else
@@ -232,7 +236,7 @@ namespace Core.UI
             dialog.OnDialogOpen();
             DialogOpened?.Invoke(dialogStack[dialogStack.Count - 1].Item1);
 
-            bool wasVisible = visibleDialogs.Contains(dialog);
+            var wasVisible = visibleDialogs.Contains(dialog);
             if (!wasVisible)
             {
                 visibleDialogs.Add(dialog);
@@ -243,7 +247,7 @@ namespace Core.UI
         {
             if (dialogStack.Count == 0 && queuedDialogs.Count > 0)
             {
-                IQueuedDialog nextDialog = queuedDialogs[0];
+                var nextDialog = queuedDialogs[0];
                 queuedDialogs.RemoveAt(0);
                 nextDialog.Dequeue(this);
             }
@@ -255,7 +259,7 @@ namespace Core.UI
 
         public string GetDialogID<TDialog>(GameObject dialog) where TDialog : class, IDialog
         {
-            TDialog dialogComponent = dialog.GetComponent<TDialog>();
+            var dialogComponent = dialog.GetComponent<TDialog>();
             var entry = dialogStack.FirstOrDefault(x => x.Item2 == dialogComponent);
             return entry != null ? entry.Item1 : string.Empty;
         }
@@ -268,9 +272,9 @@ namespace Core.UI
 
         public void CloseDialogStack()
         {
-            for (int index = dialogStack.Count - 1; index >= 0; index--)
+            for (var index = dialogStack.Count - 1; index >= 0; index--)
             {
-                IDialog dialog = dialogStack[index].Item2;
+                var dialog = dialogStack[index].Item2;
                 CloseDialog(dialog, true);
             }
         }

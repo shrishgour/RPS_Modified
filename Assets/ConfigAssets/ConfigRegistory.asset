@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: ConfigRegistory
   m_EditorClassIdentifier: 
   configStoragePath: Assets/ConfigAssets/
-  configs: []
+  configs:
+  - {fileID: 11400000, guid: df698cb8b7a5f42479d91e8b361cd09e, type: 2}
+  - {fileID: 11400000, guid: 1a3d9605588b15246822328be65e4060, type: 2}

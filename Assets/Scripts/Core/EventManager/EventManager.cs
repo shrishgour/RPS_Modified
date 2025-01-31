@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Core.Events
@@ -5,13 +6,15 @@ namespace Core.Events
     public class EventManager
     {
         private static EventManager eventManager;
+
         public delegate void EventDelegate<T>(T e) where T : GameEvent;
+
         private delegate void EventDelegate(GameEvent e);
 
-        private Dictionary<System.Type, EventDelegate> delegates = new Dictionary<System.Type, EventDelegate>();
-        private Dictionary<System.Delegate, EventDelegate> delegateLookUp = new Dictionary<System.Delegate, EventDelegate>();
+        private Dictionary<Type, EventDelegate> delegates = new();
+        private Dictionary<Delegate, EventDelegate> delegateLookUp = new();
 
-        public static EventManager instance
+        public static EventManager Instance
         {
             get
             {
@@ -36,7 +39,7 @@ namespace Core.Events
 
         public void TriggerEvent<T>(T e) where T : GameEvent
         {
-            if (delegates.TryGetValue(typeof(T), out EventDelegate eventDelegates))
+            if (delegates.TryGetValue(typeof(T), out var eventDelegates))
             {
                 eventDelegates?.Invoke(e);
             }
@@ -47,9 +50,9 @@ namespace Core.Events
             return delegateLookUp.ContainsKey(del);
         }
 
-        private EventDelegate AddDelegate<T>(EventDelegate<T> del) where T:GameEvent
+        private EventDelegate AddDelegate<T>(EventDelegate<T> del) where T : GameEvent
         {
-            if(delegateLookUp.ContainsKey(del))
+            if (delegateLookUp.ContainsKey(del))
             {
                 return null;
             }
@@ -59,20 +62,21 @@ namespace Core.Events
             delegateLookUp[del] = nonGenericDelegate;
 
             EventDelegate currDelegates = null;
-            if(delegates.TryGetValue(typeof(T), out currDelegates))
+            if (delegates.TryGetValue(typeof(T), out currDelegates))
             {
                 //delegates[typeof(T)] = currDelegates;
             }
-            delegates[typeof(T)] = currDelegates+nonGenericDelegate;
+
+            delegates[typeof(T)] = currDelegates + nonGenericDelegate;
 
             return nonGenericDelegate;
         }
 
         private void RemoveDelegate<T>(EventDelegate<T> del) where T : GameEvent
         {
-            if(delegateLookUp.TryGetValue(del, out EventDelegate nonGenericDelegate))
+            if (delegateLookUp.TryGetValue(del, out var nonGenericDelegate))
             {
-                if (delegates.TryGetValue(typeof(T), out EventDelegate tempDelegates))
+                if (delegates.TryGetValue(typeof(T), out var tempDelegates))
                 {
                     tempDelegates -= nonGenericDelegate;
                     if (tempDelegates == null)
