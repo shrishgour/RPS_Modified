@@ -21,19 +21,27 @@ namespace Game.UI
         [SerializeField] private HandButton spockButton;
         [SerializeField] private float roundTime;
         [SerializeField] private Image timer;
+        [SerializeField] private TextMeshProUGUI timerText;
         [SerializeField] private Transform[] botButtons;
 
         private Hands handsData;
 
         public override void OnDialogOpen()
         {
+            base.OnDialogOpen();
             handsData = ConfigRegistry.GetConfig<Hands>();
             ButtonInits();
 
-            StartCoroutine(RunTimer());
-            StartCoroutine(RunBotButtonAnimation());
+            timerText.SetText(roundTime.ToString());
+            timer.transform.localScale = Vector3.one;
 
             EventManager.Instance.AddListener<BotHandChosenEvent>(OnBotHandChosen);
+        }
+
+        public override void OnDialogShown()
+        {
+            StartCoroutine(RunTimer());
+            StartCoroutine(RunBotButtonAnimation());
         }
 
         private void ButtonInits()
@@ -63,6 +71,7 @@ namespace Game.UI
             {
                 currentTime -= Time.deltaTime;
                 timer.transform.DOScaleX(currentTime / roundTime, 0.01f);
+                timerText.SetText(((int)currentTime + 1).ToString());
                 yield return null;
             }
 
@@ -71,6 +80,7 @@ namespace Game.UI
 
         private IEnumerator RunBotButtonAnimation()
         {
+            yield return new WaitForSeconds(1);
             while (true)
             {
                 var index = Random.Range(0, botButtons.Length);

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9b0b61a53bafcc4486327ed6f2c07fd, type: 3}
+  m_Name: HandIcons
+  m_EditorClassIdentifier: 
+  data:
+  - handName: Rock
+    icon: {fileID: -955107254, guid: cd3e4e0858e41ef4bb81f5375b99d22f, type: 3}
+  - handName: Paper
+    icon: {fileID: 1047404747, guid: cd3e4e0858e41ef4bb81f5375b99d22f, type: 3}
+  - handName: Scissors
+    icon: {fileID: -1259443032, guid: cd3e4e0858e41ef4bb81f5375b99d22f, type: 3}
+  - handName: Lizard
+    icon: {fileID: -1829392522, guid: cd3e4e0858e41ef4bb81f5375b99d22f, type: 3}
+  - handName: Spock
+    icon: {fileID: 2011505997, guid: cd3e4e0858e41ef4bb81f5375b99d22f, type: 3}
